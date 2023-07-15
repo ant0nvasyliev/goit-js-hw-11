@@ -5,19 +5,16 @@ import SimpleLightbox from 'simplelightbox';
 // Додатковий імпорт стилів
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-// Отримання посилань на необхідні елементи DOM
 const searchForm = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
 
-// Змінні для зберігання стану пошуку і пагінації
 let currentPage = 1;
 let currentQuery = '';
 let lightbox = null;
 
-// Функція для виконання HTTP-запиту до Pixabay API
 async function searchImages(query, page = 1, perPage = 40) {
-  const apiKey = '38243534-5c7cfe447b5c7a0fae0b6f146'; // Замініть на свій унікальний ключ доступу
+  const apiKey = '38243534-5c7cfe447b5c7a0fae0b6f146';
   const apiUrl = `https://pixabay.com/api/?key=${apiKey}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`;
 
   try {
@@ -25,21 +22,18 @@ async function searchImages(query, page = 1, perPage = 40) {
     const { data } = response;
 
     if (data.hits.length === 0) {
-      // Виведення повідомлення, якщо нічого не знайдено
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     } else {
       if (page === 1) {
-        clearGallery(); // Очищення галереї при пошуку за новим ключовим словом
-        hideLoadMoreBtn(); // Приховування кнопки "Load more" при першому запиті
-        lightbox = new SimpleLightbox('.gallery a'); // Ініціалізація SimpleLightbox
+        clearGallery();
+        hideLoadMoreBtn();
+        lightbox = new SimpleLightbox('.gallery a');
       }
 
-      // Рендеринг карток зображень
       renderImages(data.hits);
 
-      // Перевірка, чи є ще результати для завантаження
       const totalHits = data.totalHits || 0;
       if (page * perPage < totalHits) {
         showLoadMoreBtn();
@@ -52,7 +46,6 @@ async function searchImages(query, page = 1, perPage = 40) {
   }
 }
 
-// Функція для рендерингу карток зображень
 function renderImages(images) {
   const galleryFragment = document.createDocumentFragment();
 
@@ -63,11 +56,9 @@ function renderImages(images) {
 
   gallery.appendChild(galleryFragment);
 
-  // Оновлення SimpleLightbox
   lightbox.refresh();
 }
 
-// Функція для створення розмітки картки зображення
 function createPhotoCard(image) {
   const photoCard = document.createElement('div');
   photoCard.classList.add('photo-card');
@@ -100,7 +91,6 @@ function createPhotoCard(image) {
   return photoCard;
 }
 
-// Функція для створення розмітки інформаційного елементу
 function createInfoItem(label, value) {
   const infoItem = document.createElement('p');
   infoItem.classList.add('info-item');
@@ -108,38 +98,31 @@ function createInfoItem(label, value) {
   return infoItem;
 }
 
-// Функція для очищення галереї
 function clearGallery() {
   gallery.innerHTML = '';
 }
 
-// Функція для показу кнопки "Load more"
 function showLoadMoreBtn() {
   loadMoreBtn.style.display = 'block';
 }
 
-// Функція для приховування кнопки "Load more"
 function hideLoadMoreBtn() {
   loadMoreBtn.style.display = 'none';
 }
 
-// Обробник події submit форми пошуку
 searchForm.addEventListener('submit', event => {
   event.preventDefault();
   const searchQuery = event.target.elements.searchQuery.value.trim();
 
   if (searchQuery !== '') {
-    // Скидання значень стану пагінації
     currentPage = 1;
     currentQuery = searchQuery;
 
-    // Виконання пошуку зображень
     searchImages(searchQuery, currentPage);
-    hideLoadMoreBtn(); // Приховування кнопки "Load more" при повторному сабміті форми
+    hideLoadMoreBtn();
   }
 });
 
-// Обробник події click на кнопці "Load more"
 loadMoreBtn.addEventListener('click', () => {
   currentPage += 1;
   searchImages(currentQuery, currentPage);
